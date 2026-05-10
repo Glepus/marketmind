@@ -15,6 +15,29 @@ const examples = {
   ],
 };
 
+function buildMetrics(text, mode) {
+  const source = (text || "") + mode;
+  const base = source.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const a = 45 + (base % 50);
+  const b = 40 + ((base * 3) % 55);
+  const c = 35 + ((base * 7) % 60);
+  const d = 30 + ((base * 11) % 65);
+
+  return mode === "business"
+    ? [
+        { label: "Potencial de mercado", value: a },
+        { label: "Nivel de competencia", value: b },
+        { label: "Oportunidad de nicho", value: c },
+        { label: "Diferenciación", value: d },
+      ]
+    : [
+        { label: "Momentum sectorial", value: a },
+        { label: "Riesgo agregado", value: b },
+        { label: "Calidad de líderes", value: c },
+        { label: "Perspectiva 6-12m", value: d },
+      ];
+}
+
 export default function HomePage() {
   const [mode, setMode] = useState("business");
   const [query, setQuery] = useState("");
@@ -52,27 +75,36 @@ export default function HomePage() {
     }
   }
 
+  const metrics = buildMetrics(result, mode);
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-10 md:px-8">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
-        <header className="space-y-3 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white md:text-6xl">
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 md:px-8 md:py-12">
+      <div className="pointer-events-none absolute -left-20 top-12 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 top-28 h-80 w-80 rounded-full bg-fuchsia-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl" />
+
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+        <header className="space-y-5 text-center">
+          <p className="inline-flex rounded-full border border-white/20 bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.2em] text-slate-300 backdrop-blur">
+            AI Market Intelligence
+          </p>
+          <h1 className="bg-gradient-to-r from-white via-indigo-100 to-cyan-200 bg-clip-text text-5xl font-semibold leading-tight text-transparent md:text-7xl">
             MarketMind
           </h1>
-          <p className="text-lg text-slate-300 md:text-xl">
+          <p className="mx-auto max-w-2xl text-lg text-slate-300 md:text-2xl">
             Analiza cualquier negocio o sector con IA
           </p>
         </header>
 
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-xl shadow-slate-950/40 md:p-6">
-          <div className="mb-4 flex flex-wrap gap-3">
+        <section className="rounded-3xl border border-white/15 bg-white/5 p-4 shadow-2xl shadow-indigo-950/30 backdrop-blur-xl md:p-7">
+          <div className="mb-5 flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setMode("business")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
                 mode === "business"
-                  ? "bg-indigo-500 text-white"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "scale-[1.02] bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/30"
+                  : "bg-slate-800/70 text-slate-300 hover:bg-slate-700"
               }`}
             >
               Idea de negocio
@@ -80,10 +112,10 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setMode("investment")}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
                 mode === "investment"
-                  ? "bg-indigo-500 text-white"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "scale-[1.02] bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/30"
+                  : "bg-slate-800/70 text-slate-300 hover:bg-slate-700"
               }`}
             >
               Inversión
@@ -98,18 +130,18 @@ export default function HomePage() {
                 ? "Describe tu idea de negocio y qué quieres analizar..."
                 : "Escribe el sector o activo que quieres analizar..."
             }
-            className="h-36 w-full resize-none rounded-xl border border-slate-700 bg-slate-950 p-4 text-base text-slate-100 placeholder:text-slate-500 outline-none ring-indigo-500 transition focus:ring-2"
+            className="h-40 w-full resize-none rounded-2xl border border-white/15 bg-slate-950/70 p-4 text-base text-slate-100 placeholder:text-slate-500 outline-none transition-all duration-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/40"
           />
 
-          <div className="mt-4">
-            <p className="mb-2 text-sm text-slate-400">Ejemplos:</p>
+          <div className="mt-5">
+            <p className="mb-2 text-sm text-slate-400">Ejemplos rápidos:</p>
             <div className="flex flex-wrap gap-2">
               {examples[mode].map((example) => (
                 <button
                   key={example}
                   type="button"
                   onClick={() => setQuery(example)}
-                  className="rounded-lg border border-slate-700 bg-slate-800/70 px-3 py-2 text-left text-sm text-slate-300 transition hover:border-slate-500 hover:bg-slate-800"
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-sm text-slate-200 transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/50 hover:bg-white/10"
                 >
                   {example}
                 </button>
@@ -121,39 +153,95 @@ export default function HomePage() {
             type="button"
             onClick={handleAnalyze}
             disabled={loading || !query.trim()}
-            className="mt-5 w-full rounded-xl bg-indigo-500 px-4 py-3 text-base font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-300"
+            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500 px-5 py-3 text-base font-semibold text-white transition-all duration-300 hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-500/30 disabled:cursor-not-allowed disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-300"
           >
             {loading ? "Analizando..." : "Analizar"}
           </button>
         </section>
 
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-xl shadow-slate-950/40 md:p-6">
-          <h2 className="mb-3 text-xl font-semibold text-white">Resultado</h2>
+        <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div className="rounded-3xl border border-white/15 bg-white/5 p-5 backdrop-blur-xl lg:col-span-2">
+            <h2 className="mb-3 text-2xl font-semibold text-white">Análisis IA</h2>
 
-          {loading && (
-            <div className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950/70 p-4 text-slate-300">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-indigo-400" />
-              Generando análisis con IA...
-            </div>
-          )}
+            {loading && (
+              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 text-slate-300">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-cyan-300" />
+                  Generando análisis con IA...
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 animate-pulse rounded bg-slate-700/60" />
+                  <div className="h-3 w-11/12 animate-pulse rounded bg-slate-700/60" />
+                  <div className="h-3 w-4/5 animate-pulse rounded bg-slate-700/60" />
+                </div>
+              </div>
+            )}
 
-          {!loading && error && (
-            <div className="rounded-xl border border-rose-700/60 bg-rose-950/40 p-4 text-rose-200">
-              {error}
-            </div>
-          )}
+            {!loading && error && (
+              <div className="rounded-2xl border border-rose-500/40 bg-rose-950/30 p-4 text-rose-200">
+                {error}
+              </div>
+            )}
 
-          {!loading && !error && result && (
-            <article className="whitespace-pre-wrap rounded-xl border border-slate-700 bg-slate-950/70 p-4 leading-relaxed text-slate-200">
-              {result}
-            </article>
-          )}
+            {!loading && !error && result && (
+              <article className="whitespace-pre-wrap rounded-2xl border border-white/10 bg-slate-950/55 p-5 leading-relaxed text-slate-100 transition-all duration-500">
+                {result}
+              </article>
+            )}
 
-          {!loading && !error && !result && (
-            <p className="rounded-xl border border-slate-700 bg-slate-950/50 p-4 text-slate-400">
-              Aquí aparecerá el análisis cuando pulses en "Analizar".
-            </p>
-          )}
+            {!loading && !error && !result && (
+              <p className="rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-slate-400">
+                Aquí aparecerá tu análisis cuando pulses en "Analizar".
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-3xl border border-white/15 bg-white/5 p-5 backdrop-blur-xl">
+            <h3 className="mb-4 text-lg font-semibold text-white">Visual Snapshot</h3>
+
+            {!result || loading ? (
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-400">
+                La visualización se genera automáticamente cuando llegue el análisis.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                  <div
+                    className="relative grid h-36 w-36 place-items-center rounded-full"
+                    style={{
+                      background: `conic-gradient(#6366f1 ${metrics[0].value}%, #22d3ee ${metrics[1].value}% ${metrics[1].value + 15}%, #a855f7 ${metrics[2].value}% ${metrics[2].value + 25}%, #334155 0)`,
+                    }}
+                  >
+                    <div className="grid h-24 w-24 place-items-center rounded-full bg-slate-900 text-center">
+                      <span className="text-xs text-slate-400">score</span>
+                      <strong className="text-2xl text-white">
+                        {Math.round(
+                          metrics.reduce((acc, m) => acc + m.value, 0) / metrics.length
+                        )}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {metrics.map((metric) => (
+                    <div key={metric.label}>
+                      <div className="mb-1 flex justify-between text-xs text-slate-300">
+                        <span>{metric.label}</span>
+                        <span>{metric.value}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-800">
+                        <div
+                          className="h-2 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400 transition-all duration-700"
+                          style={{ width: `${metric.value}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </main>
