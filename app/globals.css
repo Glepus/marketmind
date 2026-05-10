@@ -9,3 +9,35 @@
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
 }
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes auroraFloat {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.04);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+}
+
+.animate-gradient {
+  animation: gradientShift 7s ease infinite;
+}
+
+.aurora {
+  animation: auroraFloat 8s ease-in-out infinite;
+}
