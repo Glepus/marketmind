@@ -246,7 +246,7 @@ export default function HomePage() {
             AI Market Intelligence
           </p>
           <h1
-            className={`${syne.className} animate-gradient break-words bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-[clamp(2.3rem,11vw,5.7rem)] font-extrabold leading-[0.95] tracking-tight text-transparent`}
+            className={`${syne.className} animate-gradient whitespace-nowrap bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-[clamp(2.6rem,9vw,5.7rem)] font-extrabold leading-[0.95] tracking-tight text-transparent`}
           >
             MarketMind AI
           </h1>
@@ -261,42 +261,24 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setMode("business")}
-              className={`group relative overflow-hidden rounded-2xl border px-5 py-4 text-left transition-all duration-300 ${
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-300 ${
                 mode === "business"
-                  ? "scale-[1.01] border-indigo-300/40 bg-gradient-to-br from-indigo-500/80 to-cyan-500/70 text-white shadow-lg shadow-indigo-500/30"
+                  ? "border-indigo-300/40 bg-gradient-to-r from-indigo-500/80 to-cyan-500/70 text-white shadow-md shadow-indigo-500/25"
                   : "border-white/10 bg-slate-900/70 text-slate-300 hover:border-white/30 hover:bg-slate-800/80"
               }`}
             >
-              <span className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-white/10 blur-xl transition-all duration-500 group-hover:scale-125" />
-              <span className="relative flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 text-xl">
-                  💼
-                </span>
-                <span>
-                  <strong className="block text-base">Idea de negocio</strong>
-                  <span className="text-xs text-slate-200/80">Estrategia de mercado</span>
-                </span>
-              </span>
+              Idea de negocio
             </button>
             <button
               type="button"
               onClick={() => setMode("investment")}
-              className={`group relative overflow-hidden rounded-2xl border px-5 py-4 text-left transition-all duration-300 ${
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-300 ${
                 mode === "investment"
-                  ? "scale-[1.01] border-indigo-300/40 bg-gradient-to-br from-indigo-500/80 to-cyan-500/70 text-white shadow-lg shadow-indigo-500/30"
+                  ? "border-indigo-300/40 bg-gradient-to-r from-indigo-500/80 to-cyan-500/70 text-white shadow-md shadow-indigo-500/25"
                   : "border-white/10 bg-slate-900/70 text-slate-300 hover:border-white/30 hover:bg-slate-800/80"
               }`}
             >
-              <span className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-white/10 blur-xl transition-all duration-500 group-hover:scale-125" />
-              <span className="relative flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 text-xl">
-                  📈
-                </span>
-                <span>
-                  <strong className="block text-base">Inversión</strong>
-                  <span className="text-xs text-slate-200/80">Contexto sectorial</span>
-                </span>
-              </span>
+              Inversión
             </button>
           </div>
 
