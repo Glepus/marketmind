@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus_Jakarta_Sans, Syne } from "next/font/google";
+import { DM_Sans, Syne } from "next/font/google";
 
 const syne = Syne({ subsets: ["latin"], weight: ["600", "700", "800"] });
-const plusJakarta = Plus_Jakarta_Sans({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -246,7 +246,7 @@ export default function HomePage() {
             AI Market Intelligence
           </p>
           <h1
-            className={`${syne.className} animate-gradient whitespace-nowrap bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-[clamp(2.6rem,9vw,5.7rem)] font-extrabold leading-[0.95] tracking-tight text-transparent`}
+            className={`${syne.className} animate-gradient whitespace-nowrap bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-[1.3rem] font-extrabold leading-[0.95] tracking-tight text-transparent min-[390px]:text-[1.45rem] sm:text-[2rem] md:text-[4.6rem] lg:text-[5.7rem]`}
           >
             MarketMind AI
           </h1>
@@ -346,7 +346,7 @@ export default function HomePage() {
             )}
 
             {!loading && !error && result && (
-              <div className={`${plusJakarta.className} grid grid-cols-1 gap-3 md:grid-cols-2`}>
+              <div className={`${dmSans.className} grid grid-cols-1 gap-3 md:grid-cols-2`}>
                 {businessCards.map((section, index) => (
                   <article
                     key={`${section.title}-${index}`}
