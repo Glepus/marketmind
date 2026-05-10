@@ -302,9 +302,17 @@ export default function HomePage() {
                   return (
                   <article
                     key={`${card.title}-${index}`}
+                    role="button"
+                    tabIndex={0}
                     onClick={() =>
                       setExpandedCard((prev) => (prev === card.key ? null : card.key))
                     }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setExpandedCard((prev) => (prev === card.key ? null : card.key));
+                      }
+                    }}
                     className={`group cursor-pointer rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${card.color}`}
                   >
                     <div className="mb-2 flex items-center gap-2">
@@ -323,21 +331,22 @@ export default function HomePage() {
                       </span>
                     </div>
                     <p
-                      className={`text-sm leading-relaxed text-slate-200 transition-all duration-300 ${
-                        isExpanded ? "" : "overflow-hidden"
-                      }`}
-                      style={
-                        isExpanded
-                          ? undefined
-                          : {
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                            }
-                      }
+                      className="overflow-hidden text-sm leading-relaxed text-slate-200"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
                     >
-                      {isExpanded ? fullValue : summaryValue}
+                      {summaryValue}
                     </p>
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        isExpanded ? "mt-2 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed text-slate-100">{fullValue}</p>
+                    </div>
                   </article>
                   );
                 })}
