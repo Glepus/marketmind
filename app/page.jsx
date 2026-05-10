@@ -22,6 +22,79 @@ const examples = {
   ],
 };
 
+const analysisCards = [
+  {
+    key: "saturacion",
+    title: "Saturación del mercado",
+    icon: "🌊",
+    color: "from-blue-500/20 to-cyan-500/10 border-cyan-300/30",
+  },
+  {
+    key: "competencia",
+    title: "Competencia",
+    icon: "⚔️",
+    color: "from-violet-500/20 to-fuchsia-500/10 border-violet-300/30",
+  },
+  {
+    key: "oportunidades",
+    title: "Oportunidades",
+    icon: "🚀",
+    color: "from-emerald-500/20 to-teal-500/10 border-emerald-300/30",
+  },
+  {
+    key: "diferenciacion",
+    title: "Diferenciación",
+    icon: "✨",
+    color: "from-amber-500/20 to-orange-500/10 border-amber-300/30",
+  },
+  {
+    key: "veredicto",
+    title: "Veredicto",
+    icon: "✅",
+    color: "from-rose-500/20 to-pink-500/10 border-rose-300/30",
+  },
+];
+
+function shorten(text, max = 120) {
+  if (!text) return "";
+  const clean = String(text).replace(/[#*_`]/g, "").replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, max - 1).trim()}…`;
+}
+
+function parseAnalysisPayload(payload) {
+  const fallback = {
+    saturacion: "",
+    competencia: [],
+    oportunidades: "",
+    diferenciacion: [],
+    veredicto: "",
+  };
+
+  try {
+    const rawText = typeof payload === "string" ? payload : JSON.stringify(payload || {});
+    const first = rawText.indexOf("{");
+    const last = rawText.lastIndexOf("}");
+    const jsonText =
+      first >= 0 && last > first ? rawText.slice(first, last + 1) : rawText;
+    const parsed = JSON.parse(jsonText);
+
+    return {
+      saturacion: shorten(parsed?.saturacion, 110),
+      competencia: Array.isArray(parsed?.competencia)
+        ? parsed.competencia.slice(0, 3).map((item) => shorten(item, 40))
+        : [],
+      oportunidades: shorten(parsed?.oportunidades, 110),
+      diferenciacion: Array.isArray(parsed?.diferenciacion)
+        ? parsed.diferenciacion.slice(0, 3).map((item) => shorten(item, 55))
+        : [],
+      veredicto: shorten(parsed?.veredicto, 110),
+    };
+  } catch {
+    return fallback;
+  }
+}
+
 function buildMetrics(text, mode) {
   const source = (text || "") + mode;
   const base = source.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
@@ -45,159 +118,11 @@ function buildMetrics(text, mode) {
       ];
 }
 
-function extractSections(text, mode) {
-  if (!text?.trim()) return [];
-
-  const lines = text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const rawSections = [];
-  let current = null;
-
-  const titleRegex = /^(\d+[\).\-\:]\s*|[-*]\s*)?([A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\/\-]+)\s*[:\-]?\s*$/;
-
-  for (const line of lines) {
-    const match = line.match(titleRegex);
-    const isLikelyHeading =
-      match &&
-      match[2] &&
-      line.length < 90 &&
-      !line.endsWith(".") &&
-      !line.includes("  ");
-
-    if (isLikelyHeading) {
-      if (current?.content?.trim()) rawSections.push(current);
-      current = { title: match[2].trim(), content: "" };
-      continue;
-    }
-
-    if (!current) {
-      current = { title: "Resumen", content: line };
-    } else {
-      current.content += `${current.content ? "\n" : ""}${line}`;
-    }
-  }
-
-  if (current?.content?.trim()) rawSections.push(current);
-
-  const desiredBusiness = [
-    { key: "satur", title: "Saturación", icon: "📊" },
-    { key: "compet", title: "Competencia", icon: "⚔️" },
-    { key: "oportun", title: "Oportunidades", icon: "💡" },
-    { key: "diferenc", title: "Diferenciación", icon: "✨" },
-    { key: "veredic", title: "Veredicto", icon: "✅" },
-    { key: "recomend", title: "Recomendación", icon: "🧭" },
-  ];
-
-  const desiredInvestment = [
-    { key: "estado", title: "Estado del sector", icon: "🌍" },
-    { key: "tendenc", title: "Tendencias", icon: "📈" },
-    { key: "empresa", title: "Empresas destacadas", icon: "🏢" },
-    { key: "riesgo", title: "Riesgos", icon: "⚠️" },
-    { key: "perspect", title: "Perspectiva", icon: "🔭" },
-  ];
-
-  const desired = mode === "business" ? desiredBusiness : desiredInvestment;
-
-  const mapped = desired
-    .map((target) => {
-      const found = rawSections.find((section) =>
-        section.title.toLowerCase().includes(target.key)
-      );
-      return found
-        ? { title: target.title, icon: target.icon, content: found.content }
-        : null;
-    })
-    .filter(Boolean);
-
-  if (mapped.length >= 2) return mapped;
-
-  return rawSections.slice(0, 6).map((section, index) => ({
-    title: section.title || `Sección ${index + 1}`,
-    icon: ["📊", "💡", "⚠️", "✅", "📈", "🧠"][index % 6],
-    content: section.content,
-  }));
-}
-
-function buildBusinessCards(result, fallbackSections) {
-  const targetCards = [
-    {
-      title: "Saturación del mercado",
-      icon: "🌊",
-      color: "from-blue-500/20 to-cyan-500/10 border-cyan-300/30",
-      keys: ["satur", "mercado"],
-    },
-    {
-      title: "Competencia",
-      icon: "⚔️",
-      color: "from-violet-500/20 to-fuchsia-500/10 border-violet-300/30",
-      keys: ["compet", "rival"],
-    },
-    {
-      title: "Oportunidades",
-      icon: "🚀",
-      color: "from-emerald-500/20 to-teal-500/10 border-emerald-300/30",
-      keys: ["oportun", "nicho"],
-    },
-    {
-      title: "Diferenciación",
-      icon: "✨",
-      color: "from-amber-500/20 to-orange-500/10 border-amber-300/30",
-      keys: ["diferenc", "diferenciar"],
-    },
-    {
-      title: "Veredicto",
-      icon: "✅",
-      color: "from-rose-500/20 to-pink-500/10 border-rose-300/30",
-      keys: ["veredic", "recomend", "conclus"],
-    },
-  ];
-
-  const normalizedSections = fallbackSections.map((section) => ({
-    ...section,
-    titleLower: section.title.toLowerCase(),
-  }));
-
-  const mapped = targetCards.map((card, i) => {
-    const found = normalizedSections.find((section) =>
-      card.keys.some((key) => section.titleLower.includes(key))
-    );
-
-    if (found?.content?.trim()) {
-      return { ...card, content: found.content.trim() };
-    }
-
-    const fallback = normalizedSections[i];
-    return {
-      ...card,
-      content:
-        fallback?.content?.trim() ||
-        "No se detectó esta sección de forma explícita en la respuesta.",
-    };
-  });
-
-  if (mapped.some((card) => card.content.includes("No se detectó")) && result) {
-    const chunks = result
-      .split(/\n{2,}/)
-      .map((chunk) => chunk.trim())
-      .filter(Boolean);
-    mapped.forEach((card, idx) => {
-      if (card.content.includes("No se detectó")) {
-        card.content = chunks[idx] || "Sin contenido disponible para esta sección.";
-      }
-    });
-  }
-
-  return mapped;
-}
-
 export default function HomePage() {
   const [mode, setMode] = useState("business");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
   async function handleAnalyze() {
@@ -205,7 +130,7 @@ export default function HomePage() {
 
     setLoading(true);
     setError("");
-    setResult("");
+    setResult(null);
 
     try {
       const response = await fetch("/api/analyze", {
@@ -222,7 +147,19 @@ export default function HomePage() {
         throw new Error(data.error || "No se pudo generar el análisis.");
       }
 
-      setResult(data.analysis);
+      const parsed = parseAnalysisPayload(data.analysis);
+      const hasAnyContent =
+        parsed.saturacion ||
+        parsed.oportunidades ||
+        parsed.veredicto ||
+        parsed.competencia.length ||
+        parsed.diferenciacion.length;
+
+      if (!hasAnyContent) {
+        throw new Error("La respuesta no vino en JSON válido. Intenta de nuevo.");
+      }
+
+      setResult(parsed);
     } catch (err) {
       setError(err.message || "Ha ocurrido un error inesperado.");
     } finally {
@@ -230,9 +167,7 @@ export default function HomePage() {
     }
   }
 
-  const metrics = buildMetrics(result, mode);
-  const sections = extractSections(result, mode);
-  const businessCards = buildBusinessCards(result, sections);
+  const metrics = buildMetrics(result ? JSON.stringify(result) : "", mode);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#080B14] px-4 py-8 md:px-8 md:py-12">
@@ -347,24 +282,38 @@ export default function HomePage() {
 
             {!loading && !error && result && (
               <div className={`${dmSans.className} grid grid-cols-1 gap-3 md:grid-cols-2`}>
-                {businessCards.map((section, index) => (
+                {analysisCards.map((card, index) => {
+                  const value =
+                    Array.isArray(result[card.key]) && result[card.key].length
+                      ? result[card.key].join(" • ")
+                      : shorten(result[card.key] || "Sin dato disponible.", 120);
+
+                  return (
                   <article
-                    key={`${section.title}-${index}`}
-                    className={`group rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${section.color}`}
+                    key={`${card.title}-${index}`}
+                    className={`group rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${card.color}`}
                   >
                     <div className="mb-2 flex items-center gap-2">
                       <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15 text-sm">
-                        {section.icon}
+                        {card.icon}
                       </span>
                       <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
-                        {section.title}
+                        {card.title}
                       </h3>
                     </div>
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-                      {section.content}
+                    <p
+                      className="overflow-hidden text-sm leading-relaxed text-slate-200"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {value}
                     </p>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             )}
 
