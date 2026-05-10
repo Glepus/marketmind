@@ -117,6 +117,78 @@ function extractSections(text, mode) {
   }));
 }
 
+function buildBusinessCards(result, fallbackSections) {
+  const targetCards = [
+    {
+      title: "Saturación del mercado",
+      icon: "🌊",
+      color: "from-blue-500/20 to-cyan-500/10 border-cyan-300/30",
+      keys: ["satur", "mercado"],
+    },
+    {
+      title: "Competencia",
+      icon: "⚔️",
+      color: "from-violet-500/20 to-fuchsia-500/10 border-violet-300/30",
+      keys: ["compet", "rival"],
+    },
+    {
+      title: "Oportunidades",
+      icon: "🚀",
+      color: "from-emerald-500/20 to-teal-500/10 border-emerald-300/30",
+      keys: ["oportun", "nicho"],
+    },
+    {
+      title: "Diferenciación",
+      icon: "✨",
+      color: "from-amber-500/20 to-orange-500/10 border-amber-300/30",
+      keys: ["diferenc", "diferenciar"],
+    },
+    {
+      title: "Veredicto",
+      icon: "✅",
+      color: "from-rose-500/20 to-pink-500/10 border-rose-300/30",
+      keys: ["veredic", "recomend", "conclus"],
+    },
+  ];
+
+  const normalizedSections = fallbackSections.map((section) => ({
+    ...section,
+    titleLower: section.title.toLowerCase(),
+  }));
+
+  const mapped = targetCards.map((card, i) => {
+    const found = normalizedSections.find((section) =>
+      card.keys.some((key) => section.titleLower.includes(key))
+    );
+
+    if (found?.content?.trim()) {
+      return { ...card, content: found.content.trim() };
+    }
+
+    const fallback = normalizedSections[i];
+    return {
+      ...card,
+      content:
+        fallback?.content?.trim() ||
+        "No se detectó esta sección de forma explícita en la respuesta.",
+    };
+  });
+
+  if (mapped.some((card) => card.content.includes("No se detectó")) && result) {
+    const chunks = result
+      .split(/\n{2,}/)
+      .map((chunk) => chunk.trim())
+      .filter(Boolean);
+    mapped.forEach((card, idx) => {
+      if (card.content.includes("No se detectó")) {
+        card.content = chunks[idx] || "Sin contenido disponible para esta sección.";
+      }
+    });
+  }
+
+  return mapped;
+}
+
 export default function HomePage() {
   const [mode, setMode] = useState("business");
   const [query, setQuery] = useState("");
@@ -156,6 +228,7 @@ export default function HomePage() {
 
   const metrics = buildMetrics(result, mode);
   const sections = extractSections(result, mode);
+  const businessCards = buildBusinessCards(result, sections);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#080B14] px-4 py-8 md:px-8 md:py-12">
@@ -288,16 +361,16 @@ export default function HomePage() {
 
             {!loading && !error && result && (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                {sections.map((section, index) => (
+                {businessCards.map((section, index) => (
                   <article
                     key={`${section.title}-${index}`}
-                    className="group rounded-2xl border border-white/10 bg-slate-950/55 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-slate-900/70"
+                    className={`group rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${section.color}`}
                   >
                     <div className="mb-2 flex items-center gap-2">
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-sm">
+                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15 text-sm">
                         {section.icon}
                       </span>
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-cyan-200">
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
                         {section.title}
                       </h3>
                     </div>
