@@ -18,7 +18,8 @@ Aplicación web en Next.js + Tailwind CSS para analizar ideas de negocio o secto
 - Next.js (App Router)
 - React
 - Tailwind CSS
-- Anthropic SDK (`@anthropic-ai/sdk`)
+- Anthropic SDK (`@anthropic-ai/sdk`) — análisis final
+- xAI Grok API — tendencias y noticias recientes antes del análisis
 
 ## Configuración
 
@@ -27,7 +28,10 @@ Aplicación web en Next.js + Tailwind CSS para analizar ideas de negocio o secto
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-...
+GROK_API_KEY=xai-...
 ```
+
+El flujo de `/api/analyze` es: **Grok** (`grok-3` en `https://api.x.ai/v1/chat/completions`) obtiene contexto reciente → **Claude** integra ese contexto en el JSON de análisis.
 
 También tienes un ejemplo en `.env.local.example`.
 
@@ -57,6 +61,7 @@ Body JSON:
   - `business` (prompt de negocio)
   - `investment` (prompt de inversión)
 
-La API usa el modelo:
+Modelos:
 
-- `claude-sonnet-4-20250514`
+- Grok: `grok-3` (xAI)
+- Claude: `claude-sonnet-4-5`
