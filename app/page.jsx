@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Syne } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 
 const syne = Syne({ subsets: ["latin"], weight: ["600", "700", "800"] });
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 const examples = {
   business: [
@@ -242,7 +246,7 @@ export default function HomePage() {
             AI Market Intelligence
           </p>
           <h1
-            className={`${syne.className} animate-gradient bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-6xl font-extrabold leading-[0.95] tracking-tight text-transparent md:text-8xl`}
+            className={`${syne.className} animate-gradient break-words bg-[linear-gradient(110deg,#ffffff,#c4b5fd,#67e8f9,#ffffff)] bg-[length:220%_220%] bg-clip-text text-[clamp(2.3rem,11vw,5.7rem)] font-extrabold leading-[0.95] tracking-tight text-transparent`}
           >
             MarketMind AI
           </h1>
@@ -360,7 +364,7 @@ export default function HomePage() {
             )}
 
             {!loading && !error && result && (
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className={`${plusJakarta.className} grid grid-cols-1 gap-3 md:grid-cols-2`}>
                 {businessCards.map((section, index) => (
                   <article
                     key={`${section.title}-${index}`}
