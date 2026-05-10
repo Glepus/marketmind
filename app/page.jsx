@@ -62,6 +62,13 @@ function shorten(text, max = 120) {
   return `${clean.slice(0, max - 1).trim()}…`;
 }
 
+function cleanText(text) {
+  return String(text || "")
+    .replace(/[#*_`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function parseAnalysisPayload(payload) {
   const fallback = {
     saturacion: "",
@@ -80,15 +87,15 @@ function parseAnalysisPayload(payload) {
     const parsed = JSON.parse(jsonText);
 
     return {
-      saturacion: shorten(parsed?.saturacion, 110),
+      saturacion: cleanText(parsed?.saturacion),
       competencia: Array.isArray(parsed?.competencia)
-        ? parsed.competencia.slice(0, 3).map((item) => shorten(item, 40))
+        ? parsed.competencia.slice(0, 3).map((item) => cleanText(item))
         : [],
-      oportunidades: shorten(parsed?.oportunidades, 110),
+      oportunidades: cleanText(parsed?.oportunidades),
       diferenciacion: Array.isArray(parsed?.diferenciacion)
-        ? parsed.diferenciacion.slice(0, 3).map((item) => shorten(item, 55))
+        ? parsed.diferenciacion.slice(0, 3).map((item) => cleanText(item))
         : [],
-      veredicto: shorten(parsed?.veredicto, 110),
+      veredicto: cleanText(parsed?.veredicto),
     };
   } catch {
     return fallback;
@@ -124,6 +131,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [expandedCard, setExpandedCard] = useState(null);
 
   async function handleAnalyze() {
     if (!query.trim() || loading) return;
@@ -131,6 +139,7 @@ export default function HomePage() {
     setLoading(true);
     setError("");
     setResult(null);
+    setExpandedCard(null);
 
     try {
       const response = await fetch("/api/analyze", {
@@ -283,15 +292,20 @@ export default function HomePage() {
             {!loading && !error && result && (
               <div className={`${dmSans.className} grid grid-cols-1 gap-3 md:grid-cols-2`}>
                 {analysisCards.map((card, index) => {
-                  const value =
+                  const fullValue =
                     Array.isArray(result[card.key]) && result[card.key].length
                       ? result[card.key].join(" • ")
-                      : shorten(result[card.key] || "Sin dato disponible.", 120);
+                      : cleanText(result[card.key] || "Sin dato disponible.");
+                  const summaryValue = shorten(fullValue, 120);
+                  const isExpanded = expandedCard === card.key;
 
                   return (
                   <article
                     key={`${card.title}-${index}`}
-                    className={`group rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${card.color}`}
+                    onClick={() =>
+                      setExpandedCard((prev) => (prev === card.key ? null : card.key))
+                    }
+                    className={`group cursor-pointer rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/70 ${card.color}`}
                   >
                     <div className="mb-2 flex items-center gap-2">
                       <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/15 text-sm">
@@ -300,16 +314,29 @@ export default function HomePage() {
                       <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
                         {card.title}
                       </h3>
+                      <span
+                        className={`ml-auto text-xs text-slate-200 transition-transform duration-300 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      >
+                        ▾
+                      </span>
                     </div>
                     <p
-                      className="overflow-hidden text-sm leading-relaxed text-slate-200"
-                      style={{
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
+                      className={`text-sm leading-relaxed text-slate-200 transition-all duration-300 ${
+                        isExpanded ? "" : "overflow-hidden"
+                      }`}
+                      style={
+                        isExpanded
+                          ? undefined
+                          : {
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                            }
+                      }
                     >
-                      {value}
+                      {isExpanded ? fullValue : summaryValue}
                     </p>
                   </article>
                   );
